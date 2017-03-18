@@ -8,6 +8,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
 
+    Model *m = new Model;
+    connect(m, SIGNAL(changed()), this, SLOT(notify()));
+
+
     // generate some data:
     QVector<double> x(101), y(101); // initialize with entries 0..100
     for (int i=0; i<101; ++i)
@@ -30,6 +34,11 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::notify()
+{
+
 }
 
 void MainWindow::on_pushButton_clicked()
