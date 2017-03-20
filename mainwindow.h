@@ -2,7 +2,10 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QObject>
+#include <QLayoutItem>
 #include "model.h"
+
 
 namespace Ui {
 class MainWindow;
@@ -17,14 +20,16 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_pushButton_clicked();
 
 public slots:
+    void onSerialPortsChanged();
     void notify();
+    void newMeasurement(int measID);
 
 private:
     Ui::MainWindow *ui;
-
+    Model *mModel;
+    QSpacerItem *mSpacer;
 };
 
 #endif // MAINWINDOW_H

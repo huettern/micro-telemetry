@@ -4,8 +4,7 @@
 #include <QObject>
 #include <QSerialPort>
 
-#include <QMainWindow>
-#include "mainwindow.h"
+#include "measurement.h"
 
 class Model : public QObject
 {
@@ -13,8 +12,14 @@ class Model : public QObject
 public:
     explicit Model(QObject *parent = 0);
 
+    QStringList* getPortList();
+    QString getMeasurementName(int measID);
+    QString getMeasurementUnit(int measID);
+
 private:
     QSerialPort *mPort;
+    QStringList *mPortList;
+    QList<Measurement*> *mMeasurements;
 
 private slots:
     void readData();
@@ -22,6 +27,8 @@ private slots:
 
 signals:
     void changed();
+    void serialPortsChanged();
+    void measurementAdded(int measID);
 
 public slots:
 };

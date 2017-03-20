@@ -15,10 +15,14 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     qcustomplot.cpp \
-    model.cpp
+    model.cpp \
+    measurementwidget.cpp \
+    measurement.cpp
 
 HEADERS  += mainwindow.h \
     qcustomplot.h \
-    model.h
+    model.h \
+    measurementwidget.h \
+    measurement.h
 
 FORMS    += mainwindow.ui
