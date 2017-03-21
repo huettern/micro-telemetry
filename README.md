@@ -13,8 +13,8 @@ N: Packet size in byte
 | 3 | | total packet length MSB |
 | 4 | | Package type |
 | n | | Optional: Data |
-| N-2 | cc | End of uTelemetry packet |
-| N-1 | ff | End of uTelemetry packet |
+| N-2 | cb | End of uTelemetry packet |
+| N-1 | fe | End of uTelemetry packet |
 
 ### Package types
 | Package type code hex  | Description  | Has Data |

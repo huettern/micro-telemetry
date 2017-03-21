@@ -5,6 +5,7 @@
 #include <QSerialPort>
 
 #include "measurement.h"
+#include "packet.h"
 
 class Model : public QObject
 {
@@ -20,6 +21,11 @@ private:
     QSerialPort *mPort;
     QStringList *mPortList;
     QList<Measurement*> *mMeasurements;
+
+    Packet *mCurrentPacket;
+    Packet *mFinishedPacket;
+
+    bool mIsReceivingPacket;
 
 private slots:
     void readData();

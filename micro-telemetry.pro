@@ -17,12 +17,14 @@ SOURCES += main.cpp\
     qcustomplot.cpp \
     model.cpp \
     measurementwidget.cpp \
-    measurement.cpp
+    measurement.cpp \
+    packet.cpp
 
 HEADERS  += mainwindow.h \
     qcustomplot.h \
     model.h \
     measurementwidget.h \
-    measurement.h
+    measurement.h \
+    packet.h
 
 FORMS    += mainwindow.ui
