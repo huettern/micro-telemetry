@@ -4,6 +4,7 @@
 
 #include <QTimer>
 #include <QSerialPortInfo>
+#include <qdebug.h>
 
 Model::Model(QObject *parent) : QObject(parent)
 {
@@ -13,12 +14,35 @@ Model::Model(QObject *parent) : QObject(parent)
     mCurrentPacket = new Packet;
 
     mIsReceivingPacket = false;
+    mSyncMutex.tryLock(100);
 
     connect(mPort, &QSerialPort::readyRead, this, &Model::readData);
 
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(timerSlot()));
     timer->start(1000);
+}
+
+
+void Model::setThread (QThread *thr)
+{
+    mThread = thr;
+    connect(thr, SIGNAL(started()), this, SLOT(do_continuousConversion()));
+}
+
+void Model::do_continuousConversion()
+{
+    unsigned long timeUs = 100;
+    while(mAbort == false)
+    {
+//        mThread->usleep(timeUs);
+//        mSyncMutex.lock();
+//        mParsePacket.wait(&mSyncMutex);
+//        // A new packet is ready to be parsed
+
+//        mSyncMutex.unlock();
+    }
+    qDebug() << "exiting FFT thread";
 }
 
 /**
@@ -88,7 +112,7 @@ void Model::readData()
         {
             mCurrentPacket->addData(data);
         }
-        // Process data here
+        mParsePacket.wakeAll();
         break;
     default:
         break;
@@ -122,4 +146,12 @@ QString Model::getMeasurementName(int measID)
 QString Model::getMeasurementUnit(int measID)
 {
     return mMeasurements->at(measID)->unit;
+}
+
+/**
+ * @brief Exits
+ */
+void Model::abortThread()
+{
+    mAbort = true;
 }

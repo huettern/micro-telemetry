@@ -12,7 +12,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
 
-    mModel = new Model;
+    mModel = new Model();
+//    mModelThread = new QThread();
+//    mModel->setThread(mModelThread);
+//    mModel->moveToThread(mModelThread);
+//    mModelThread->start(QThread::NormalPriority);
+
     connect(mModel, SIGNAL(changed()), this, SLOT(notify()));
     connect(mModel, SIGNAL(serialPortsChanged()), this, SLOT(onSerialPortsChanged()));
     connect(mModel, SIGNAL(measurementAdded(int)), this, SLOT(newMeasurement(int)));
@@ -55,6 +60,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    mModelThread->quit();
+    mModelThread->wait();
     delete ui;
 }
 

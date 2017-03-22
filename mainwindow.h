@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QObject>
 #include <QLayoutItem>
+#include <QThread>
 #include "model.h"
 
 
@@ -30,6 +31,7 @@ private:
     Ui::MainWindow *ui;
     Model *mModel;
     QSpacerItem *mSpacer;
+    QThread *mModelThread;
 };
 
 #endif // MAINWINDOW_H
