@@ -10,7 +10,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
+    ui->btDisconnect->setEnabled(false);
 
     mModel = new Model();
 //    mModelThread = new QThread();
@@ -99,4 +99,21 @@ void MainWindow::newMeasurement(int measID)
     ui->wMeasurementContainer->layout()->removeItem(mSpacer);
     ui->wMeasurementContainer->layout()->addWidget(meas);
     ui->wMeasurementContainer->layout()->addItem(mSpacer);
+}
+
+void MainWindow::on_btConnect_clicked()
+{
+    ui->cbPortList->setEnabled(false);
+    ui->btConnect->setEnabled(false);
+    ui->btDisconnect->setEnabled(true);
+    QString name = ui->cbPortList->currentText();
+    mModel->openPort(&name);
+}
+
+void MainWindow::on_btDisconnect_clicked()
+{
+    mModel->closePort();
+    ui->cbPortList->setEnabled(true);
+    ui->btConnect->setEnabled(true);
+    ui->btDisconnect->setEnabled(false);
 }

@@ -22,6 +22,10 @@ public:
 
 private slots:
 
+    void on_btConnect_clicked();
+
+    void on_btDisconnect_clicked();
+
 public slots:
     void onSerialPortsChanged();
     void notify();

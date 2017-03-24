@@ -7,8 +7,10 @@
 #include <QMutex>
 #include <QWaitCondition>
 
-#include "measurement.h"
-#include "packet.h"
+
+//#include "packet.h"
+class Packet;
+class Measurement;
 
 class Model : public QObject
 {
@@ -20,8 +22,13 @@ public:
     void abortThread();
 
     QStringList* getPortList();
+    void openPort(QString* name);
+    void closePort();
     QString getMeasurementName(int measID);
     QString getMeasurementUnit(int measID);
+    Measurement* getMeasurement(int measID);
+    void setClientRunning(bool s);
+    void addMeasurement(Measurement* meas);
 
 private:
     QSerialPort *mPort;
@@ -33,6 +40,7 @@ private:
 
     bool mIsReceivingPacket;
     bool mAbort = false;
+    bool mClientRunning = false;
 
     QThread *mThread;
     QMutex mSyncMutex;

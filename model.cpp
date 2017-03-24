@@ -1,6 +1,7 @@
 #include "model.h"
 #include "mainwindow.h"
-
+#include "packet.h"
+#include "measurement.h"
 
 #include <QTimer>
 #include <QSerialPortInfo>
@@ -11,7 +12,7 @@ Model::Model(QObject *parent) : QObject(parent)
     mPort = new QSerialPort(this);
     mPortList = new QStringList;
     mMeasurements = new QList<Measurement*>;
-    mCurrentPacket = new Packet;
+    mCurrentPacket = new Packet(this);
 
     mIsReceivingPacket = false;
     mSyncMutex.tryLock(100);
@@ -68,24 +69,30 @@ void Model::timerSlot()
         emit serialPortsChanged();
     }
 
+    // If a packet is parsed
+    if(mParsePacket.wait(&mSyncMutex,1))
+    {
+        qInfo("packet ready to parse");
+    }
+
     // DEBUG: Add measurement
-    Measurement *meas = new Measurement;
-    meas->name = "Test Name";
-    meas->unit = "Test unit";
-    mMeasurements->append(meas);
-    emit measurementAdded(mMeasurements->length()-1);
+//    Measurement *meas = new Measurement;
+//    meas->name = "Test Name";
+//    meas->unit = "Test unit";
+//    mMeasurements->append(meas);
+//    emit measurementAdded(mMeasurements->length()-1);
 
     // DEBUG: Create packate
-    QByteArray ba;
-    ba.resize(7);
-    ba[0] = 0xff;
-    ba[1] = 0xcc;
-    ba[2] = 0x07;
-    ba[3] = 0x00;
-    ba[4] = 0x00;
-    ba[5] = 0xcb;
-    ba[6] = 0xfe;
-    Packet::tPacketStatus stat =  mCurrentPacket->addData(ba);
+//    QByteArray ba;
+//    ba.resize(7);
+//    ba[0] = 0xff;
+//    ba[1] = 0xcc;
+//    ba[2] = 0x07;
+//    ba[3] = 0x00;
+//    ba[4] = 0x00;
+//    ba[5] = 0xcb;
+//    ba[6] = 0xfe;
+//    Packet::tPacketStatus stat =  mCurrentPacket->addData(ba);
 }
 
 /**
@@ -93,6 +100,7 @@ void Model::timerSlot()
  */
 void Model::readData()
 {
+    qInfo("Data received");
     QByteArray data = mPort->readAll();
 
     Packet::tPacketStatus stat =  mCurrentPacket->addData(data);
@@ -106,13 +114,14 @@ void Model::readData()
         break;
     case Packet::PACKET_ENDED:
         mFinishedPacket = mCurrentPacket;
-        mCurrentPacket = new Packet;
+        mCurrentPacket = new Packet(this);
         data = mFinishedPacket->getRemainingData();
         if (data.length() != 0)
         {
             mCurrentPacket->addData(data);
         }
-        mParsePacket.wakeAll();
+        // parse packet
+        mFinishedPacket->parse();
         break;
     default:
         break;
@@ -149,9 +158,62 @@ QString Model::getMeasurementUnit(int measID)
 }
 
 /**
+ * @brief get the measurement
+ * @param measurement id
+ * @return Unit
+ */
+Measurement *Model::getMeasurement(int measID)
+{
+    return mMeasurements->at(measID);
+}
+
+/**
  * @brief Exits
  */
 void Model::abortThread()
 {
     mAbort = true;
+}
+
+void Model::openPort(QString *name)
+{
+    mPort->setPortName(*name);
+    mPort->setBaudRate(115200);
+    mPort->setDataBits(QSerialPort::Data8);
+    mPort->setParity(QSerialPort::NoParity);
+    mPort->setStopBits(QSerialPort::OneStop);
+    mPort->setFlowControl(QSerialPort::NoFlowControl);
+    try {
+        mPort->open(QIODevice::ReadWrite);
+    } catch (...) {
+        qInfo("Error opening serial port");
+    }
+}
+
+void Model::closePort()
+{
+    try {
+        mPort->close();
+    } catch (...) {
+        qInfo("Error closing serial port");
+    }
+}
+
+/**
+ * @brief Model::setClientRunning
+ * @param s
+ */
+void Model::setClientRunning(bool s)
+{
+    mClientRunning = s;
+}
+
+/**
+ * @brief add new measurement
+ * @param meas
+ */
+void Model::addMeasurement(Measurement* meas)
+{
+    mMeasurements->append(meas);
+    emit measurementAdded(mMeasurements->length()-1);
 }

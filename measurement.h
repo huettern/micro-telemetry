@@ -2,6 +2,9 @@
 #define MEASUREMENT_H
 
 #include <QObject>
+#include <QVector>
+
+#include "packet.h"
 
 class Measurement : public QObject
 {
@@ -9,8 +12,15 @@ class Measurement : public QObject
 public:
     explicit Measurement(QObject *parent = 0);
 
+    uint16_t id;
     QString name;
     QString unit;
+
+    Packet::tDataTypes xDataType;
+    Packet::tDataTypes yDataType;
+
+    QVector<double> xdata;
+    QVector<double> ydata;
 
 signals:
 
