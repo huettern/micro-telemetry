@@ -131,17 +131,29 @@ QVector<double> *Packet::parseData(QByteArray in, tDataTypes type, int num)
     int32_t tmp32;
     uint64_t tmpu64;
     int64_t tmp64;
+    int j = 0;
+
+    union toFloat
+    {
+        uint32_t byte;
+        float f;
+    } tofloat;
+    union toDouble
+    {
+        uint64_t byte;
+        double d;
+    } todouble;
 
     switch(type)
     {
         case TYPE_uint8:
-            for(int i = 0; i < num; i++)
+        for(int i = 0; i < num*mDataTypeSizes[type]; i++)
             {
                 (*out)[i] = ((double)((uint8_t)in.at(i)));
             }
             break;
         case TYPE_int8:
-            for(int i = 0; i < num; i++)
+        for(int i = 0; i < num*mDataTypeSizes[type]; i++)
             {
                 (*out)[i] = ((double)((int8_t)in.at(i)));
             }
@@ -151,48 +163,88 @@ QVector<double> *Packet::parseData(QByteArray in, tDataTypes type, int num)
             {
                 tmpu16  = ((uint16_t)in.at(i));
                 tmpu16 |= ((uint16_t)in.at(++i)) << 8;
-                (*out)[i] = (double)(tmpu16);
+                (*out)[j++] = (double)(tmpu16);
             }
             break;
         case TYPE_int16:
-            for(int i = 0; i < num; i++)
+            for(int i = 0; i < num*mDataTypeSizes[type]; i++)
             {
                 tmp16  = ((int16_t)in.at(i));
                 tmp16 |= ((int16_t)in.at(++i)) << 8;
-                (*out)[i] = (double)(tmp16);
+                (*out)[j++] = (double)(tmp16);
             }
             break;
         case TYPE_uint32:
-            for(int i = 0; i < num; i++)
+        for(int i = 0; i < num*mDataTypeSizes[type]; i++)
             {
                 tmpu32  = ((uint32_t)in.at(i));
                 tmpu32 |= ((uint32_t)in.at(++i)) << 8;
                 tmpu32 |= ((uint32_t)in.at(++i)) << 16;
                 tmpu32 |= ((uint32_t)in.at(++i)) << 24;
-                (*out)[i] = (double)(tmpu32);
+                (*out)[j++] = (double)(tmpu32);
             }
             break;
         case TYPE_int32:
-            for(int i = 0; i < num; i++)
+        for(int i = 0; i < num*mDataTypeSizes[type]; i++)
             {
                 tmp32  = ((int32_t)in.at(i));
                 tmp32 |= ((int32_t)in.at(++i)) << 8;
                 tmp32 |= ((int32_t)in.at(++i)) << 16;
                 tmp32 |= ((int32_t)in.at(++i)) << 24;
-                (*out)[i] = (double)(tmp32);
+                (*out)[j++] = (double)(tmp32);
             }
             break;
         case TYPE_uint64:
-
+        for(int i = 0; i < num*mDataTypeSizes[type]; i++)
+            {
+                tmpu64  = ((uint64_t)in.at(i));
+                tmpu64 |= ((uint64_t)in.at(++i)) << 8;
+                tmpu64 |= ((uint64_t)in.at(++i)) << 16;
+                tmpu64 |= ((uint64_t)in.at(++i)) << 24;
+                tmpu64 |= ((uint64_t)in.at(++i)) << 32;
+                tmpu64 |= ((uint64_t)in.at(++i)) << 40;
+                tmpu64 |= ((uint64_t)in.at(++i)) << 48;
+                tmpu64 |= ((uint64_t)in.at(++i)) << 56;
+                (*out)[j++] = (double)(tmpu64);
+            }
             break;
         case TYPE_int64:
-
+        for(int i = 0; i < num*mDataTypeSizes[type]; i++)
+            {
+                tmp64  = ((int64_t)in.at(i));
+                tmp64 |= ((int64_t)in.at(++i)) << 8;
+                tmp64 |= ((int64_t)in.at(++i)) << 16;
+                tmp64 |= ((int64_t)in.at(++i)) << 24;
+                tmp64 |= ((int64_t)in.at(++i)) << 32;
+                tmp64 |= ((int64_t)in.at(++i)) << 40;
+                tmp64 |= ((int64_t)in.at(++i)) << 48;
+                tmp64 |= ((int64_t)in.at(++i)) << 56;
+                (*out)[j++] = (double)(tmp64);
+            }
             break;
         case TYPE_float:
-
+        for(int i = 0; i < num*mDataTypeSizes[type]; i++)
+            {
+                tofloat.byte  = ((uint32_t)in.at(i));
+                tofloat.byte |= ((uint32_t)in.at(++i)) << 8;
+                tofloat.byte |= ((uint32_t)in.at(++i)) << 16;
+                tofloat.byte |= ((uint32_t)in.at(++i)) << 24;
+                (*out)[j++] = (double)(tofloat.f);
+            }
             break;
         case TYPE_double:
-
+        for(int i = 0; i < num*mDataTypeSizes[type]; i++)
+            {
+                todouble.byte  = ((uint64_t)in.at(i));
+                todouble.byte |= ((uint64_t)in.at(++i)) << 8;
+                todouble.byte |= ((uint64_t)in.at(++i)) << 16;
+                todouble.byte |= ((uint64_t)in.at(++i)) << 24;
+                todouble.byte |= ((uint64_t)in.at(++i)) << 32;
+                todouble.byte |= ((uint64_t)in.at(++i)) << 40;
+                todouble.byte |= ((uint64_t)in.at(++i)) << 48;
+                todouble.byte |= ((uint64_t)in.at(++i)) << 56;
+                (*out)[j++] = todouble.d;
+            }
             break;
         default: break;
     }
