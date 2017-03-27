@@ -35,6 +35,7 @@ public slots:
     void onSerialPortsChanged();
     void notify();
     void newMeasurement(int measID);
+    void onAddMeasurementDialogClosed(QVector<uint16_t> *mids);
 
 private:
     Ui::MainWindow *ui;

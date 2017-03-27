@@ -31,6 +31,8 @@ public:
     void addMeasurement(Measurement* meas);
     void measurementChanged(uint16_t mid);
 
+    QList<uint16_t> *getMeasurementIDs();
+
 private:
     QSerialPort *mPort;
     QStringList *mPortList;

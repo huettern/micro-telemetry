@@ -2,6 +2,8 @@
 #define ADDMEASUREMENTDIALOG_H
 
 #include <QDialog>
+#include <QStringListModel>
+#include <QStringList>
 
 namespace Ui {
 class AddMeasurementDialog;
@@ -15,8 +17,21 @@ public:
     explicit AddMeasurementDialog(QWidget *parent = 0);
     ~AddMeasurementDialog();
 
+    void addEntry(QString *name);
+    void show();
+
+public slots:
+    void okClick();
+    void cancelClick();
+
+signals:
+    void dialogClosed(QVector<uint16_t> *mids);
+
 private:
     Ui::AddMeasurementDialog *ui;
+
+    QStringListModel *mModel;
+    QStringList *mList;
 };
 
 #endif // ADDMEASUREMENTDIALOG_H

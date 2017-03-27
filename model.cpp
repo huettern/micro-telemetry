@@ -226,3 +226,17 @@ void Model::measurementChanged(uint16_t mid)
 {
 
 }
+
+/**
+ * @brief Returns a list of all Measurement IDs available
+ * @return QList of mids
+ */
+QList<uint16_t> *Model::getMeasurementIDs()
+{
+    QList<uint16_t> *res = new QList<uint16_t>;
+    for(uint16_t i = 0; i < mMeasurements->length(); i++)
+    {
+        if(mMeasurements->at(i)) res->append(i);
+    }
+    return res;
+}

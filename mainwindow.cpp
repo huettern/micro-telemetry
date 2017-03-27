@@ -142,6 +142,43 @@ void MainWindow::measurementChanged(uint16_t mid)
 
 void MainWindow::on_btPlot0Add_clicked()
 {
+    QString *s;
     AddMeasurementDialog *dialog = new AddMeasurementDialog();
+    connect(dialog, SIGNAL(dialogClosed(QVector<uint16_t>*)),
+            this, SLOT(onAddMeasurementDialogClosed(QVector<uint16_t>*)));
+
+    QList<uint16_t> *mids = mModel->getMeasurementIDs();
+
+    for (int i = 0; i < mids->size(); i++)
+    {
+        s = new QString();
+        s->sprintf("%d: %s [%s]",mids->at(i),
+                                       mModel->getMeasurementName(mids->at(i)).toStdString(),
+                                       mModel->getMeasurementUnit(mids->at(i)).toStdString());
+        dialog->addEntry(s);
+    }
+    dialog->setWindowTitle("Add Measurement");
+    s = new QString();
+    s->sprintf("1: d f");
+    dialog->addEntry(s);
+    s = new QString();
+    s->sprintf("2: d f");
+    dialog->addEntry(s);
+    s = new QString();
+    s->sprintf("3: d f");
+    dialog->addEntry(s);
+    s = new QString();
+    s->sprintf("004: d f");
+    dialog->addEntry(s);
+
     dialog->show();
+}
+
+/**
+ * @brief Gets called after the add measurement dialog closes
+ * @param mids vector of selected measurement IDs
+ */
+void MainWindow::onAddMeasurementDialogClosed(QVector<uint16_t> *mids)
+{
+
 }
