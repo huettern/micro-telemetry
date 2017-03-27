@@ -18,13 +18,16 @@ SOURCES += main.cpp\
     model.cpp \
     measurementwidget.cpp \
     measurement.cpp \
-    packet.cpp
+    packet.cpp \
+    addmeasurementdialog.cpp
 
 HEADERS  += mainwindow.h \
     qcustomplot.h \
     model.h \
     measurementwidget.h \
     measurement.h \
-    packet.h
+    packet.h \
+    addmeasurementdialog.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    addmeasurementdialog.ui

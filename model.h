@@ -29,6 +29,7 @@ public:
     Measurement* getMeasurement(int measID);
     void setClientRunning(bool s);
     void addMeasurement(Measurement* meas);
+    void measurementChanged(uint16_t mid);
 
 private:
     QSerialPort *mPort;

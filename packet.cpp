@@ -115,13 +115,22 @@ void Packet::parse()
             ydata = parseData(mInData->mid(9+numpoints*mDataTypeSizes[mModel->getMeasurement(id)->xDataType], numpoints*mDataTypeSizes[mModel->getMeasurement(id)->yDataType]),
                     mModel->getMeasurement(id)->yDataType,
                     numpoints);
-
+            mModel->getMeasurement(id)->xdata.append(*xdata);
+            mModel->getMeasurement(id)->ydata.append(*ydata);
+            mModel->measurementChanged(id);
             break;
 //        default:
 //            break;
     }
 }
 
+/**
+ * @brief parses the data in the in Array to a QVector<double>
+ * @param QBteArray with payload
+ * @param measurement data type
+ * @param number of data points in array in
+ * @return QVector<double> with data points
+ */
 QVector<double> *Packet::parseData(QByteArray in, tDataTypes type, int num)
 {
     QVector<double> *out = new QVector<double>(num);

@@ -4,6 +4,9 @@
 #include "ui_mainwindow.h"
 
 #include "measurementwidget.h"
+#include "measurement.h"
+
+#include "addmeasurementdialog.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -11,6 +14,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->btDisconnect->setEnabled(false);
+    mMGAssociations = new QList<tsMeasGrpahAssociation>;
 
     mModel = new Model();
 //    mModelThread = new QThread();
@@ -26,7 +30,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->wMeasurementContainer->layout()->addItem(mSpacer);
 
 //    // DEBUG
-////    layout->addWidget(new MeasurementWidget, 0,0,1,1,Qt::AlignCenter);
+//    layout->addWidget(new MeasurementWidget, 0,0,1,1,Qt::AlignCenter);
 
 //    mSpacer = new QSpacerItem(1,1,QSizePolicy::Expanding,QSizePolicy::Expanding);
 //    ui->wMeasurementContainer->layout()->addWidget(new MeasurementWidget);
@@ -47,15 +51,15 @@ MainWindow::MainWindow(QWidget *parent) :
 //      y[i] = x[i]*x[i]; // let's plot a quadratic function
 //    }
 //    // create graph and assign data to it:
-//    ui->customPlot->addGraph();
+    ui->customPlot->addGraph();
 //    ui->customPlot->graph(0)->setData(x, y);
 //    // give the axes some labels:
-//    ui->customPlot->xAxis->setLabel("x");
-//    ui->customPlot->yAxis->setLabel("y");
+    ui->customPlot->xAxis->setLabel("x");
+    ui->customPlot->yAxis->setLabel("y");
 //    // set axes ranges, so we see all data:
 //    ui->customPlot->xAxis->setRange(-1, 1);
 //    ui->customPlot->yAxis->setRange(0, 1);
-//    ui->customPlot->replot();
+    ui->customPlot->replot();
 }
 
 MainWindow::~MainWindow()
@@ -96,6 +100,7 @@ void MainWindow::newMeasurement(int measID)
     meas->setName(mModel->getMeasurementName(measID));
     meas->setUnit(mModel->getMeasurementUnit(measID));
 
+    // Add Widget and the spacer after the widget
     ui->wMeasurementContainer->layout()->removeItem(mSpacer);
     ui->wMeasurementContainer->layout()->addWidget(meas);
     ui->wMeasurementContainer->layout()->addItem(mSpacer);
@@ -116,4 +121,27 @@ void MainWindow::on_btDisconnect_clicked()
     ui->cbPortList->setEnabled(true);
     ui->btConnect->setEnabled(true);
     ui->btDisconnect->setEnabled(false);
+}
+
+/**
+ * @brief Update all Plots where the measurement is displayed
+ * @param mid Measurement ID to update
+ */
+void MainWindow::measurementChanged(uint16_t mid)
+{
+    for(int i = 0; i < mMGAssociations->length(); i++)
+    {
+        if(mMGAssociations->at(i).mid == mid)
+        {
+            mMGAssociations->at(i).graph->setData(mModel->getMeasurement(mid)->xdata,
+                                                 mModel->getMeasurement(mid)->ydata);
+            mMGAssociations->at(i).plot->replot();
+        }
+    }
+}
+
+void MainWindow::on_btPlot0Add_clicked()
+{
+    AddMeasurementDialog *dialog = new AddMeasurementDialog();
+    dialog->show();
 }

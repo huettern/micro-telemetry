@@ -217,3 +217,12 @@ void Model::addMeasurement(Measurement* meas)
     mMeasurements->append(meas);
     emit measurementAdded(mMeasurements->length()-1);
 }
+
+/**
+ * @brief Call if a measurement has changed
+ * @param mid Measurement id
+ */
+void Model::measurementChanged(uint16_t mid)
+{
+
+}

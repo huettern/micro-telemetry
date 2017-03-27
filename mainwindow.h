@@ -5,6 +5,7 @@
 #include <QObject>
 #include <QLayoutItem>
 #include <QThread>
+#include "qcustomplot.h"
 #include "model.h"
 
 
@@ -20,11 +21,15 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    void measurementChanged(uint16_t mid);
+
 private slots:
 
     void on_btConnect_clicked();
 
     void on_btDisconnect_clicked();
+
+    void on_btPlot0Add_clicked();
 
 public slots:
     void onSerialPortsChanged();
@@ -36,6 +41,14 @@ private:
     Model *mModel;
     QSpacerItem *mSpacer;
     QThread *mModelThread;
+
+    typedef struct
+    {
+        uint16_t mid;
+        QCPGraph *graph;
+        QCustomPlot *plot;
+    } tsMeasGrpahAssociation;
+    QList<tsMeasGrpahAssociation> *mMGAssociations;
 };
 
 #endif // MAINWINDOW_H
