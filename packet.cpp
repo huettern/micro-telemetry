@@ -125,6 +125,12 @@ void Packet::parse()
 QVector<double> *Packet::parseData(QByteArray in, tDataTypes type, int num)
 {
     QVector<double> *out = new QVector<double>(num);
+    uint16_t tmpu16;
+    int16_t tmp16;
+    uint32_t tmpu32;
+    int32_t tmp32;
+    uint64_t tmpu64;
+    int64_t tmp64;
 
     switch(type)
     {
@@ -141,16 +147,40 @@ QVector<double> *Packet::parseData(QByteArray in, tDataTypes type, int num)
             }
             break;
         case TYPE_uint16:
-
+            for(int i = 0; i < num; i++)
+            {
+                tmpu16  = ((uint16_t)in.at(i));
+                tmpu16 |= ((uint16_t)in.at(++i)) << 8;
+                (*out)[i] = (double)(tmpu16);
+            }
             break;
         case TYPE_int16:
-
+            for(int i = 0; i < num; i++)
+            {
+                tmp16  = ((int16_t)in.at(i));
+                tmp16 |= ((int16_t)in.at(++i)) << 8;
+                (*out)[i] = (double)(tmp16);
+            }
             break;
         case TYPE_uint32:
-
+            for(int i = 0; i < num; i++)
+            {
+                tmpu32  = ((uint32_t)in.at(i));
+                tmpu32 |= ((uint32_t)in.at(++i)) << 8;
+                tmpu32 |= ((uint32_t)in.at(++i)) << 16;
+                tmpu32 |= ((uint32_t)in.at(++i)) << 24;
+                (*out)[i] = (double)(tmpu32);
+            }
             break;
         case TYPE_int32:
-
+            for(int i = 0; i < num; i++)
+            {
+                tmp32  = ((int32_t)in.at(i));
+                tmp32 |= ((int32_t)in.at(++i)) << 8;
+                tmp32 |= ((int32_t)in.at(++i)) << 16;
+                tmp32 |= ((int32_t)in.at(++i)) << 24;
+                (*out)[i] = (double)(tmp32);
+            }
             break;
         case TYPE_uint64:
 

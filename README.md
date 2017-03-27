@@ -73,6 +73,6 @@ Number of X and Y data must always be same length
 | 6 | xx | Unique Measurement ID MSB | 
 | 7 | xx | Number of data points LSB | 
 | 8 | xx | Number of data points MSB | 
-| 9 | xx | X Data | 
-|   | xx | Y Data | 
+| 9 | xx | X Data LSB first | 
+|   | xx | Y Data LSB first | 
 
