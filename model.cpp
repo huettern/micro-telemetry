@@ -100,32 +100,35 @@ void Model::timerSlot()
  */
 void Model::readData()
 {
+    Packet::tPacketStatus stat;
+    bool allDataParsed = true;
     qInfo("Data received");
     QByteArray data = mPort->readAll();
 
-    Packet::tPacketStatus stat =  mCurrentPacket->addData(data);
-
-    switch (stat) {
-    case Packet::PACKET_NONE:
-        break;
-    case Packet::PACKET_STARTED:
-        break;
-    case Packet::PACKET_FILLING:
-        break;
-    case Packet::PACKET_ENDED:
-        mFinishedPacket = mCurrentPacket;
-        mCurrentPacket = new Packet(this);
-        data = mFinishedPacket->getRemainingData();
-        if (data.length() != 0)
+    do
+    {
+        stat =  mCurrentPacket->addData(data);
+        switch (stat)
         {
-            mCurrentPacket->addData(data);
+        case Packet::PACKET_NONE:
+            break;
+        case Packet::PACKET_STARTED:
+            break;
+        case Packet::PACKET_FILLING:
+            break;
+        case Packet::PACKET_ENDED:
+            mFinishedPacket = mCurrentPacket;
+            mCurrentPacket = new Packet(this);
+            data = mFinishedPacket->getRemainingData();
+            if (data.length() != 0) allDataParsed = false;
+            else allDataParsed = true;
+            // parse packet
+            mFinishedPacket->parse();
+            break;
+        default:
+            break;
         }
-        // parse packet
-        mFinishedPacket->parse();
-        break;
-    default:
-        break;
-    }
+    } while(!allDataParsed);
 }
 
 /**
@@ -175,6 +178,10 @@ void Model::abortThread()
     mAbort = true;
 }
 
+/**
+ * @brief Open the serial port
+ * @param name name of the serial port
+ */
 void Model::openPort(QString *name)
 {
     mPort->setPortName(*name);
@@ -190,6 +197,9 @@ void Model::openPort(QString *name)
     }
 }
 
+/**
+ * @brief Close the serial port
+ */
 void Model::closePort()
 {
     try {

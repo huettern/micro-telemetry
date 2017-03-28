@@ -53,6 +53,17 @@ private:
     const uint8_t mDataTypeSizes[10] =
       { 1, 1, 2, 2, 4, 4, 8, 8, 4, 8};
 
+    typedef union toFloat
+    {
+        uint32_t byte;
+        float f;
+    } ttofloat;
+    typedef union toDouble
+    {
+        uint64_t byte;
+        double d;
+    } ttodouble;
+
     QVector<double> *parseData(QByteArray in, tDataTypes type, int num);
 
 signals:
