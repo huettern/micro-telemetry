@@ -5,6 +5,8 @@
 #include <QStringListModel>
 #include <QStringList>
 
+#include "qcustomplot.h"
+
 namespace Ui {
 class AddMeasurementDialog;
 }
@@ -19,6 +21,8 @@ public:
 
     void addEntry(QString *name);
     void show();
+
+    QCustomPlot *mPlot;
 
 public slots:
     void okClick();

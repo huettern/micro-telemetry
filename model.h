@@ -29,7 +29,7 @@ public:
     Measurement* getMeasurement(int measID);
     void setClientRunning(bool s);
     void addMeasurement(Measurement* meas);
-    void measurementChanged(uint16_t mid);
+    void measUpdated(uint16_t mid);
 
     QList<uint16_t> *getMeasurementIDs();
 
@@ -58,6 +58,8 @@ signals:
     void changed();
     void serialPortsChanged();
     void measurementAdded(int measID);
+    void measurementChanged(uint16_t mid);
+
 
 public slots:
     void do_continuousConversion();

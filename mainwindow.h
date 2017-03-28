@@ -8,6 +8,7 @@
 #include "qcustomplot.h"
 #include "model.h"
 
+#include "addmeasurementdialog.h"
 
 namespace Ui {
 class MainWindow;
@@ -20,8 +21,6 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-
-    void measurementChanged(uint16_t mid);
 
 private slots:
 
@@ -36,6 +35,7 @@ public slots:
     void notify();
     void newMeasurement(int measID);
     void onAddMeasurementDialogClosed(QVector<uint16_t> *mids);
+    void onMeasurementChanged(uint16_t mid);
 
 private:
     Ui::MainWindow *ui;
@@ -46,10 +46,13 @@ private:
     typedef struct
     {
         uint16_t mid;
+        int graphid;
         QCPGraph *graph;
         QCustomPlot *plot;
     } tsMeasGrpahAssociation;
-    QList<tsMeasGrpahAssociation> *mMGAssociations;
+    QList<tsMeasGrpahAssociation*> *mMGAssociations;
+
+    AddMeasurementDialog *mAddMeasDialog;
 };
 
 #endif // MAINWINDOW_H

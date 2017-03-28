@@ -6,7 +6,6 @@
 #include "measurementwidget.h"
 #include "measurement.h"
 
-#include "addmeasurementdialog.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -14,7 +13,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->btDisconnect->setEnabled(false);
-    mMGAssociations = new QList<tsMeasGrpahAssociation>;
+    mMGAssociations = new QList<tsMeasGrpahAssociation*>;
 
     mModel = new Model();
 //    mModelThread = new QThread();
@@ -25,6 +24,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(mModel, SIGNAL(changed()), this, SLOT(notify()));
     connect(mModel, SIGNAL(serialPortsChanged()), this, SLOT(onSerialPortsChanged()));
     connect(mModel, SIGNAL(measurementAdded(int)), this, SLOT(newMeasurement(int)));
+    connect(mModel, SIGNAL(measurementChanged(uint16_t)), this, SLOT(onMeasurementChanged(uint16_t)));
 
     mSpacer = new QSpacerItem(1,1,QSizePolicy::Expanding,QSizePolicy::Expanding);
     ui->wMeasurementContainer->layout()->addItem(mSpacer);
@@ -60,12 +60,14 @@ MainWindow::MainWindow(QWidget *parent) :
 //    ui->customPlot->xAxis->setRange(-1, 1);
 //    ui->customPlot->yAxis->setRange(0, 1);
     ui->customPlot->replot();
+    ui->customPlot->setInteraction(QCP::iRangeDrag, true);
+    ui->customPlot->setInteraction(QCP::iRangeZoom, true);
 }
 
 MainWindow::~MainWindow()
 {
-    mModelThread->quit();
-    mModelThread->wait();
+//    mModelThread->quit();
+//    mModelThread->wait();
     delete ui;
 }
 
@@ -127,15 +129,15 @@ void MainWindow::on_btDisconnect_clicked()
  * @brief Update all Plots where the measurement is displayed
  * @param mid Measurement ID to update
  */
-void MainWindow::measurementChanged(uint16_t mid)
+void MainWindow::onMeasurementChanged(uint16_t mid)
 {
     for(int i = 0; i < mMGAssociations->length(); i++)
     {
-        if(mMGAssociations->at(i).mid == mid)
+        if(mMGAssociations->at(i)->mid == mid)
         {
-            mMGAssociations->at(i).graph->setData(mModel->getMeasurement(mid)->xdata,
+            mMGAssociations->at(i)->graph->setData(mModel->getMeasurement(mid)->xdata,
                                                  mModel->getMeasurement(mid)->ydata);
-            mMGAssociations->at(i).plot->replot();
+            mMGAssociations->at(i)->plot->replot();
         }
     }
 }
@@ -143,8 +145,8 @@ void MainWindow::measurementChanged(uint16_t mid)
 void MainWindow::on_btPlot0Add_clicked()
 {
     QString *s;
-    AddMeasurementDialog *dialog = new AddMeasurementDialog();
-    connect(dialog, SIGNAL(dialogClosed(QVector<uint16_t>*)),
+    mAddMeasDialog = new AddMeasurementDialog();
+    connect(mAddMeasDialog, SIGNAL(dialogClosed(QVector<uint16_t>*)),
             this, SLOT(onAddMeasurementDialogClosed(QVector<uint16_t>*)));
 
     QList<uint16_t> *mids = mModel->getMeasurementIDs();
@@ -153,32 +155,34 @@ void MainWindow::on_btPlot0Add_clicked()
     {
         s = new QString();
         s->sprintf("%d: %s [%s]",mids->at(i),
-                                       mModel->getMeasurementName(mids->at(i)).toStdString(),
-                                       mModel->getMeasurementUnit(mids->at(i)).toStdString());
-        dialog->addEntry(s);
+                                       mModel->getMeasurementName(mids->at(i)).toLatin1().data(),
+                                       mModel->getMeasurementUnit(mids->at(i)).toLatin1().data());
+        mAddMeasDialog->addEntry(s);
     }
-    dialog->setWindowTitle("Add Measurement");
-    s = new QString();
-    s->sprintf("1: d f");
-    dialog->addEntry(s);
-    s = new QString();
-    s->sprintf("2: d f");
-    dialog->addEntry(s);
-    s = new QString();
-    s->sprintf("3: d f");
-    dialog->addEntry(s);
-    s = new QString();
-    s->sprintf("004: d f");
-    dialog->addEntry(s);
+    mAddMeasDialog->setWindowTitle("Add Measurement");
+    mAddMeasDialog->mPlot = ui->customPlot;
 
-    dialog->show();
+    mAddMeasDialog->show();
 }
 
 /**
- * @brief Gets called after the add measurement dialog closes
+ * @brief Gets called after the add measurement mAddMeasDialog closes
  * @param mids vector of selected measurement IDs
  */
 void MainWindow::onAddMeasurementDialogClosed(QVector<uint16_t> *mids)
 {
+    tsMeasGrpahAssociation *mga;
+    for(int i = 0; i < mids->size(); i++)
+    {
+        mga = new tsMeasGrpahAssociation;
+        mga->mid = mids->at(i);
 
+        // Create graph
+        mga->graph = ui->customPlot->addGraph();
+        mga->plot = mAddMeasDialog->mPlot;
+        mga->graph->setData(mModel->getMeasurement(mids->at(i))->xdata, mModel->getMeasurement(mids->at(i))->ydata);
+        mga->plot->replot();
+
+        mMGAssociations->append(mga);
+    }
 }

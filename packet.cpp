@@ -117,7 +117,7 @@ void Packet::parse()
                     numpoints);
             mModel->getMeasurement(id)->xdata.append(*xdata);
             mModel->getMeasurement(id)->ydata.append(*ydata);
-            mModel->measurementChanged(id);
+            mModel->measUpdated(id);
             break;
 //        default:
 //            break;
@@ -257,7 +257,5 @@ QVector<double> *Packet::parseData(QByteArray in, tDataTypes type, int num)
             break;
         default: break;
     }
-
-
-
+    return out;
 }

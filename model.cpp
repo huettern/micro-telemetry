@@ -222,9 +222,9 @@ void Model::addMeasurement(Measurement* meas)
  * @brief Call if a measurement has changed
  * @param mid Measurement id
  */
-void Model::measurementChanged(uint16_t mid)
+void Model::measUpdated(uint16_t mid)
 {
-
+    emit measurementChanged(mid);
 }
 
 /**
