@@ -17,8 +17,6 @@ Model::Model(QObject *parent) : QObject(parent)
     mIsReceivingPacket = false;
     mSyncMutex.tryLock(100);
 
-    connect(mPort, &QSerialPort::readyRead, this, &Model::readData);
-
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(timerSlot()));
     timer->start(1000);
@@ -195,6 +193,8 @@ void Model::openPort(QString *name)
     } catch (...) {
         qInfo("Error opening serial port");
     }
+    while(mPort->readAll().length());
+    connect(mPort, &QSerialPort::readyRead, this, &Model::readData);
 }
 
 /**
@@ -207,6 +207,7 @@ void Model::closePort()
     } catch (...) {
         qInfo("Error closing serial port");
     }
+    disconnect(mPort, &QSerialPort::readyRead, this, &Model::readData);
 }
 
 /**
